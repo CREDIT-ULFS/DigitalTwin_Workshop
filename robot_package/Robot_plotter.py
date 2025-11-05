@@ -1,6 +1,5 @@
 import numpy as np
 import pyvista as pv
-import pyvistaqt as pvqt
 from PyQt5 import  QtGui
 from pathlib import Path
 import os
@@ -9,6 +8,7 @@ import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import QAction
 from time import time, sleep
 
+pv.set_jupyter_backend('html')
 
 class RobotPlotter:
     def __init__(self, robot, 
@@ -40,19 +40,19 @@ class RobotPlotter:
         # Initialize the plotter
 
 
-        self.plot = pvqt.BackgroundPlotter(window_size=(1000, 1000))
+        self.plot = pv.Plotter(off_screen=True, window_size=(1000, 1000), notebook = True)
         
         self.plot.enable_anti_aliasing()
 
-        self.plot.auto_update = 0.01
-        self.plot.app_window.setWindowTitle('Robot Visualizer')
+        # self.plot.auto_update = 0.01
+        # self.plot.app_window.setWindowTitle('Robot Visualizer')
         self.plot.background_color = "#FFFFFF"
         if GCS:
             self.plot.add_axes(line_width=5, labels_off=True)
         self.plot.enable_eye_dome_lighting()
-        light = pv.Light((2000, 2000, 2000), (0, 0, 0), 'white',intensity=0.7)
+        light = pv.Light(position = (2000, 2000, 2000), focal_point = (0, 0, 0), color = 'white',intensity=0.7)
         self.plot.add_light(light)
-        light = pv.Light((-2000, -2000, 2000), (0, 0, 0), 'white',intensity=0.7)
+        light = pv.Light(position = (-2000, -2000, 2000), focal_point = (0, 0, 0), color = 'white',intensity=0.7)
         self.plot.add_light(light)
         
         # Add floor
@@ -69,12 +69,13 @@ class RobotPlotter:
         self.plot.camera_position = pos
         
         
-        self.animate_toolbar = self.plot.app_window.addToolBar('Animate Modeshape')
+        #self.animate_toolbar = self.plot.app_window.addToolBar('Animate Modeshape')
         self.animation_traj = None
     #------------------------------------------------------------------------------    
         if self.origin:
             add_frame(self.plot, np.eye(4), scale=3, name_='world')
         
+        self.plot.show(auto_close=False)
         
     
     
@@ -195,8 +196,8 @@ class RobotPlotter:
         if save_video:
             self.plot.mwriter.close()
 
-        if not save_video and not time_slider and self.animation_traj is None:
-            self.add_action(self.animate_toolbar, "Animate", self.animate_traj)
+        #if not save_video and not time_slider and self.animation_traj is None:
+        #    self.add_action(self.animate_toolbar, "Animate", self.animate_traj)
         self.animation_traj = trajectory 
     
     def animate_traj(self):
