@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import scipy as sp
 import sympy as sym
 import pyvista as pv
-import pyvistaqt as pvqt
 from tabulate import tabulate
 from numpy import sin as s, cos as c, pi
 import symengine
@@ -11,6 +10,8 @@ from tqdm import tqdm
 
 from .Robot_plotter import RobotPlotter
 from .Inverse_Kinematics import InverseKinematics
+
+pv.set_jupyter_backend('html')
 
 class Robot:
     def __init__(self,
@@ -384,6 +385,8 @@ class Robot:
         if self.plotter.traj_actor is not None:
             self.plotter.traj_actor.SetVisibility(False)
         self.plotter.plot.clear_slider_widgets()
+        
+        self.plotter.plot.render()
             
         
     def animate(self, trajectory, **kwargs):
